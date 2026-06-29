@@ -58,7 +58,7 @@
   <h1>Credit Application <span>/ Кредитная заявка</span></h1>
   <p class="subtitle">Fields marked <span style="color:#E24B4A">*</span> are required &nbsp;/&nbsp; Поля со <span style="color:#E24B4A">*</span> обязательны для заполнения</p>
 
-  <form action="https://formspree.io/f/xaqgbaag" method="POST">
+  <form id="credit-form">
 
   <div class="section-header">Personal Information <span class="ru">/ Личная информация</span></div>
 
@@ -296,7 +296,30 @@
 
   </form>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
+emailjs.init('p9IYye7BwFwBiNNOv');
+
+document.getElementById('credit-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = form.querySelector('.submit-btn');
+  btn.textContent = 'Sending... / Отправляем...';
+  btn.disabled = true;
+
+  const data = new FormData(form);
+  let msg = '';
+  data.forEach((val, key) => { if (val) msg += key + ': ' + val + '\n'; });
+
+  emailjs.send('service_5apit64', 'template_u1y3y5e', { message: msg })
+    .then(() => { window.location.href = 'thank-you.html'; })
+    .catch(err => {
+      alert('Error sending. Please try again. / Ошибка отправки. Попробуйте снова.');
+      btn.textContent = 'Submit Application / Отправить заявку';
+      btn.disabled = false;
+    });
+});
+
 function maskField(id, formatter, validator, errMsg) {
   const el = document.getElementById(id);
   if (!el) return;
